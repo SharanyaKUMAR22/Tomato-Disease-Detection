@@ -177,30 +177,53 @@
     </footer>
 
    <script>
-        // TIMER LOGIC
-        let sec = 0;
-        let timer = null;
-        function startTimer() {
-            timer = setInterval(() => {
-                sec++;
-                let m = Math.floor(sec / 60);
-                let s = sec % 60;
-                document.getElementById('displayTime').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                
-                if (sec >= 480 && sec < 600) { // 8-10 Mins Warning
-                    document.getElementById('timerContainer').classList.add('timer-warning');
-                    document.getElementById('timerIcon').classList.replace('fa-hourglass-start', 'fa-hourglass-half');
-                } else if (sec >= 600) { // 10 Mins Stop
-                    clearInterval(timer);
-                    document.getElementById('timerContainer').classList.replace('timer-warning', 'timer-stop');
-                    document.getElementById('displayTime').innerText = "10:00";
-                    document.getElementById('timerIcon').classList.replace('fa-hourglass-half', 'fa-hourglass-end');
-                }
-            }, 1000);
+let sec = 0;
+let timer = null;
+
+function startTimer() {
+    const display = document.getElementById('displayTime');
+    const container = document.getElementById('timerContainer');
+    const icon = document.getElementById('timerIcon');
+
+    if (!display || !container || !icon) {
+        console.error("Timer elements not found!");
+        return;
+    }
+
+    timer = setInterval(() => {
+        sec++;
+
+        let m = Math.floor(sec / 60);
+        let s = sec % 60;
+
+        display.innerText =
+            m.toString().padStart(2, '0') + ":" +
+            s.toString().padStart(2, '0');
+
+        // 8–10 minute warning
+        if (sec >= 480 && sec < 600) {
+            container.classList.add('timer-warning');
+            icon.classList.remove('fa-hourglass-start');
+            icon.classList.add('fa-hourglass-half');
         }
 
-        // RESULTS CHART (Demo Data)
-        const ctx = document.getElementById('resultsChart').getContext('2d');
+        // Stop at 10 minutes
+        if (sec >= 600) {
+            clearInterval(timer);
+            container.classList.remove('timer-warning');
+            container.classList.add('timer-stop');
+            display.innerText = "10:00";
+            icon.classList.remove('fa-hourglass-half');
+            icon.classList.add('fa-hourglass-end');
+        }
+
+    }, 1000);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    startTimer();
+})
+const ctx = document.getElementById('resultsChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -222,6 +245,7 @@
                 }
             }
         });
+
     </script>
 </body>
 </html>
